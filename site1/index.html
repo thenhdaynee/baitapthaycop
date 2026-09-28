@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Website 1 - Gọi API Node-RED</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 40px; background-color: #f4f6f9; text-align: center; }
+        .card { background: white; padding: 25px; border-radius: 10px; max-width: 450px; margin: 0 auto; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        button:hover { background: #0056b3; }
+        ul { list-style: none; padding: 0; margin-top: 20px; text-align: left; }
+        li { padding: 8px; border-bottom: 1px solid #eee; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Website 1: Danh Sách Sinh Viên</h2>
+        <button onclick="loadData()">Tải Danh Sách</button>
+        <p id="msg" style="color: #28a745; font-weight: bold;"></p>
+        <ul id="student-list"></ul>
+    </div>
+
+    <script>
+        async function loadData() {
+            document.getElementById('msg').innerText = "Đang kết nối API...";
+            try {
+                // Gọi API tới /api/tacke qua Reverse Proxy Nginx
+                const response = await fetch('/api/tacke');
+                const data = await response.json();
+
+                if (data.ok === 1) {
+                    document.getElementById('msg').innerText = "Trạng thái: " + data.msg;
+                    const list = document.getElementById('student-list');
+                    list.innerHTML = "";
+
+                    data.dssv.forEach(student => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<b>Họ tên:</b> ${student.name} | <b>Số tiền:</b> ${student.money} VNĐ`;
+                        list.appendChild(li);
+                    });
+                }
+            } catch (err) {
+                console.error(err);
+                document.getElementById('msg').innerText = "Lỗi khi gọi API!";
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./site1:/usr/share/nginx/html/site1
+      - ./site2:/usr/share/nginx/html/site2
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+
+  nodered:
+    image: nodered/node-red:latest
+    container_name: nodered
+    restart: always
+    ports:
+      - "1880:1880"
+    volumes:
+      - nodered_data:/data
+
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: app_db
+    volumes:
+      - db_data:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mariadb
+
+  cloudflare:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflare
+    restart: always
+    command: tunnel --no-autoupdate run --token eyJhIjoiNGYzMjFiY2QxNDVlMTMwMTkzZjZmYjRmOGVkOWVmZjUiLCJ0IjoiM2E3ZDgxODMtMjRkNi00OGM2LWFiODItYWUyZTc5MzkxNTQzIiwicyI6Ik5qQmtZbUl4TmpJdE56bGhNQzAwWkdGakxXRXdZamd0TkdReFlqRmlaREF6WldJeCJ9
+
+volumes:
+  nodered_data:
+  db_data:
